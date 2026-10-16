@@ -1,0 +1,10 @@
+node_modules
+dist
+.expo
+.env*
+*.log
+.venv
+__pycache__
+.DS_Store
+ios
+android

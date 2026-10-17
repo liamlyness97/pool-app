@@ -6,12 +6,26 @@ import { Link, useLocalSearchParams } from "expo-router";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { STATUS_STYLE } from "../(tabs)";
+import { create } from "zustand";
 
 const c = chalkTheme.colors;
 
 type TableCardProps = {
   table: VenueTable;
 };
+
+const useDurationStore = create((set) => ({
+  duration: 1,
+  increment: () =>
+    set((state) => ({
+      duration: state.duration + 1,
+    })),
+  decrement: () =>
+    set((state) => ({
+      duration: state.duration != 1 ? state.duration - 1 : (state.duration = 1),
+    })),
+  reset: () => set({ duration: 1 }),
+}));
 
 function TablePhoto() {
   return (
@@ -78,110 +92,193 @@ function TableDetails({ table }: TableCardProps) {
 
 function StartTime() {
   return (
-    <ScrollView
-      horizontal={true}
-      contentContainerStyle={{ gap: 10, paddingHorizontal: spacing.md }}
-      showsHorizontalScrollIndicator={false}
-      contentInset={{ left: spacing.lg }}
-    >
+    <View style={{ paddingHorizontal: spacing.md, gap: spacing.sm }}>
+      <View>
+        <Text style={{ color: c.ink, fontWeight: "700" }}>Start time</Text>
+      </View>
+      <ScrollView
+        horizontal={true}
+        contentContainerStyle={{ gap: 10 }}
+        showsHorizontalScrollIndicator={false}
+        contentInset={{ left: spacing.lg }}
+      >
+        <View
+          style={{
+            width: 100,
+            height: 50,
+            justifyContent: "center",
+            backgroundColor: c.ink,
+            borderWidth: 1,
+            borderColor: c.ink,
+            borderRadius: radii.sm,
+          }}
+        >
+          <Text style={{ color: c.surface, textAlign: "center" }}>Now</Text>
+        </View>
+        <View
+          style={{
+            width: 100,
+            height: 50,
+            justifyContent: "center",
+            backgroundColor: c.bg,
+            borderRadius: radii.sm,
+            borderWidth: 1,
+          }}
+        >
+          <Text style={{ color: c.ink, textAlign: "center" }}>19:30</Text>
+        </View>
+        <View
+          style={{
+            width: 100,
+            height: 50,
+            justifyContent: "center",
+            backgroundColor: c.bg,
+            borderRadius: radii.sm,
+            borderWidth: 1,
+          }}
+        >
+          <Text style={{ color: c.ink, textAlign: "center" }}>20:00</Text>
+        </View>
+        <View
+          style={{
+            width: 100,
+            height: 50,
+            justifyContent: "center",
+            backgroundColor: c.bg,
+            borderRadius: radii.sm,
+            borderWidth: 1,
+          }}
+        >
+          <Text style={{ color: c.ink, textAlign: "center" }}>20:30</Text>
+        </View>
+        <View
+          style={{
+            width: 100,
+            height: 50,
+            justifyContent: "center",
+            backgroundColor: c.bg,
+            borderRadius: radii.sm,
+            borderWidth: 1,
+          }}
+        >
+          <Text style={{ color: c.ink, textAlign: "center" }}>21:00</Text>
+        </View>
+        <View
+          style={{
+            width: 100,
+            height: 50,
+            justifyContent: "center",
+            backgroundColor: c.bg,
+            borderRadius: radii.sm,
+            borderWidth: 1,
+          }}
+        >
+          <Text style={{ color: c.ink, textAlign: "center" }}>21:30</Text>
+        </View>
+        <View
+          style={{
+            width: 100,
+            height: 50,
+            justifyContent: "center",
+            backgroundColor: c.bg,
+            borderRadius: radii.sm,
+            borderWidth: 1,
+          }}
+        >
+          <Text style={{ color: c.ink, textAlign: "center" }}>22:00</Text>
+        </View>
+        <View
+          style={{
+            width: 100,
+            height: 50,
+            justifyContent: "center",
+            backgroundColor: c.bg,
+            borderRadius: radii.sm,
+            borderWidth: 1,
+          }}
+        >
+          <Text style={{ color: c.ink, textAlign: "center" }}>22:30</Text>
+        </View>
+      </ScrollView>
+    </View>
+  );
+}
+
+function Duration() {
+  const duration = useDurationStore((state) => state.duration);
+  const increment = useDurationStore((state) => state.increment);
+  const decrement = useDurationStore((state) => state.decrement);
+
+  return (
+    <View style={{ gap: spacing.sm }}>
+      <View>
+        <Text style={{ color: c.ink, fontWeight: "700" }}>Duration</Text>
+      </View>
       <View
         style={{
-          width: 100,
-          height: 50,
-          justifyContent: "center",
-          backgroundColor: c.ink,
+          flexDirection: "row",
+          backgroundColor: c.surface,
           borderWidth: 1,
           borderColor: c.ink,
-          borderRadius: radii.sm,
+          borderRadius: radii.md,
+          paddingHorizontal: spacing.lg,
+          paddingVertical: spacing.lg,
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
-        <Text style={{ color: c.surface, textAlign: "center" }}>Now</Text>
+        <Pressable
+          onPress={decrement}
+          style={{ paddingHorizontal: spacing.sm }}
+        >
+          <MaterialDesignIcons name="minus" size={20} />
+        </Pressable>
+        <Text style={{ fontSize: 18, fontWeight: "700" }}>{duration} hour</Text>
+        <Pressable
+          onPress={increment}
+          style={{ paddingHorizontal: spacing.sm }}
+        >
+          <MaterialDesignIcons name="plus" size={20} />
+        </Pressable>
       </View>
-      <View
-        style={{
-          width: 100,
-          height: 50,
-          justifyContent: "center",
-          backgroundColor: c.bg,
-          borderRadius: radii.sm,
-          borderWidth: 1,
-        }}
-      >
-        <Text style={{ color: c.ink, textAlign: "center" }}>19:30</Text>
+    </View>
+  );
+}
+
+function TableTotal({ price }: { price: number }) {
+  const duration = useDurationStore((state) => state.duration);
+  const subTotal = price * duration;
+  const tax = subTotal * 0.2;
+  const total = subTotal + tax;
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        backgroundColor: c.surface,
+        borderWidth: 1,
+        borderColor: c.ink,
+        borderRadius: radii.md,
+        paddingHorizontal: spacing.lg,
+        paddingVertical: spacing.lg,
+        justifyContent: "space-between",
+        alignItems: "center",
+      }}
+    >
+      <View style={{ gap: spacing.sm }}>
+        <Text style={{ color: c.muted }}>
+          {duration} {duration > 1 ? "hours" : "hour"}
+        </Text>
+        <Text style={{ fontWeight: "800", fontSize: 18 }}>Total</Text>
       </View>
-      <View
-        style={{
-          width: 100,
-          height: 50,
-          justifyContent: "center",
-          backgroundColor: c.bg,
-          borderRadius: radii.sm,
-          borderWidth: 1,
-        }}
-      >
-        <Text style={{ color: c.ink, textAlign: "center" }}>20:00</Text>
+      <View style={{ gap: spacing.sm }}>
+        <Text style={{ color: c.muted, textAlign: "right" }}>
+          £{subTotal.toFixed(2)}
+        </Text>
+        <Text style={{ fontWeight: "800", fontSize: 18, textAlign: "right" }}>
+          £{total.toFixed(2)}
+        </Text>
       </View>
-      <View
-        style={{
-          width: 100,
-          height: 50,
-          justifyContent: "center",
-          backgroundColor: c.bg,
-          borderRadius: radii.sm,
-          borderWidth: 1,
-        }}
-      >
-        <Text style={{ color: c.ink, textAlign: "center" }}>20:30</Text>
-      </View>
-      <View
-        style={{
-          width: 100,
-          height: 50,
-          justifyContent: "center",
-          backgroundColor: c.bg,
-          borderRadius: radii.sm,
-          borderWidth: 1,
-        }}
-      >
-        <Text style={{ color: c.ink, textAlign: "center" }}>21:00</Text>
-      </View>
-      <View
-        style={{
-          width: 100,
-          height: 50,
-          justifyContent: "center",
-          backgroundColor: c.bg,
-          borderRadius: radii.sm,
-          borderWidth: 1,
-        }}
-      >
-        <Text style={{ color: c.ink, textAlign: "center" }}>21:30</Text>
-      </View>
-      <View
-        style={{
-          width: 100,
-          height: 50,
-          justifyContent: "center",
-          backgroundColor: c.bg,
-          borderRadius: radii.sm,
-          borderWidth: 1,
-        }}
-      >
-        <Text style={{ color: c.ink, textAlign: "center" }}>22:00</Text>
-      </View>
-      <View
-        style={{
-          width: 100,
-          height: 50,
-          justifyContent: "center",
-          backgroundColor: c.bg,
-          borderRadius: radii.sm,
-          borderWidth: 1,
-        }}
-      >
-        <Text style={{ color: c.ink, textAlign: "center" }}>22:30</Text>
-      </View>
-    </ScrollView>
+    </View>
   );
 }
 
@@ -200,7 +297,7 @@ export default function TableDetailScreen() {
       style={{
         backgroundColor: c.bg,
         paddingHorizontal: spacing.md,
-        gap: spacing.lg,
+        gap: spacing.xl,
       }}
     >
       <Link href="/" asChild>
@@ -227,6 +324,10 @@ export default function TableDetailScreen() {
       <TableDetails table={data} />
 
       <StartTime />
+
+      <Duration />
+
+      <TableTotal price={data.price} />
     </SafeAreaView>
   );
 }

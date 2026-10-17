@@ -6,7 +6,8 @@ import { Link, useLocalSearchParams } from "expo-router";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { STATUS_STYLE } from "../(tabs)";
-import { create } from "zustand";
+import { useState } from "react";
+import { FlatList } from "react-native-gesture-handler";
 
 const c = chalkTheme.colors;
 
@@ -14,18 +15,17 @@ type TableCardProps = {
   table: VenueTable;
 };
 
-const useDurationStore = create((set) => ({
-  duration: 1,
-  increment: () =>
-    set((state) => ({
-      duration: state.duration + 1,
-    })),
-  decrement: () =>
-    set((state) => ({
-      duration: state.duration != 1 ? state.duration - 1 : (state.duration = 1),
-    })),
-  reset: () => set({ duration: 1 }),
-}));
+type DurationProps = {
+  duration: number;
+  onIncrement: () => void;
+  onDecrement: () => void;
+};
+
+type StartTimeProps = {
+  availability: string[];
+  selected: string;
+  onSelect: (time: string) => void;
+};
 
 function TablePhoto() {
   return (
@@ -90,7 +90,7 @@ function TableDetails({ table }: TableCardProps) {
   );
 }
 
-function StartTime() {
+function StartTime({ availability, selected, onSelect }: StartTimeProps) {
   return (
     <View style={{ paddingHorizontal: spacing.md, gap: spacing.sm }}>
       <View>
@@ -100,153 +100,82 @@ function StartTime() {
         horizontal={true}
         contentContainerStyle={{ gap: 10 }}
         showsHorizontalScrollIndicator={false}
-        contentInset={{ left: spacing.lg }}
       >
-        <View
-          style={{
-            width: 100,
-            height: 50,
-            justifyContent: "center",
-            backgroundColor: c.ink,
-            borderWidth: 1,
-            borderColor: c.ink,
-            borderRadius: radii.sm,
-          }}
+        <Pressable
+          onPress={() => onSelect("Now")}
+          style={
+            selected == "Now"
+              ? {
+                  width: 100,
+                  height: 50,
+                  justifyContent: "center",
+                  backgroundColor: c.ink,
+                  borderWidth: 1,
+                  borderColor: c.ink,
+                  borderRadius: radii.sm,
+                }
+              : {
+                  width: 100,
+                  height: 50,
+                  justifyContent: "center",
+                  backgroundColor: c.bg,
+                  borderRadius: radii.sm,
+                  borderWidth: 1,
+                }
+          }
         >
-          <Text style={{ color: c.surface, textAlign: "center" }}>Now</Text>
-        </View>
-        <View
-          style={{
-            width: 100,
-            height: 50,
-            justifyContent: "center",
-            backgroundColor: c.bg,
-            borderRadius: radii.sm,
-            borderWidth: 1,
-          }}
-        >
-          <Text style={{ color: c.ink, textAlign: "center" }}>19:30</Text>
-        </View>
-        <View
-          style={{
-            width: 100,
-            height: 50,
-            justifyContent: "center",
-            backgroundColor: c.bg,
-            borderRadius: radii.sm,
-            borderWidth: 1,
-          }}
-        >
-          <Text style={{ color: c.ink, textAlign: "center" }}>20:00</Text>
-        </View>
-        <View
-          style={{
-            width: 100,
-            height: 50,
-            justifyContent: "center",
-            backgroundColor: c.bg,
-            borderRadius: radii.sm,
-            borderWidth: 1,
-          }}
-        >
-          <Text style={{ color: c.ink, textAlign: "center" }}>20:30</Text>
-        </View>
-        <View
-          style={{
-            width: 100,
-            height: 50,
-            justifyContent: "center",
-            backgroundColor: c.bg,
-            borderRadius: radii.sm,
-            borderWidth: 1,
-          }}
-        >
-          <Text style={{ color: c.ink, textAlign: "center" }}>21:00</Text>
-        </View>
-        <View
-          style={{
-            width: 100,
-            height: 50,
-            justifyContent: "center",
-            backgroundColor: c.bg,
-            borderRadius: radii.sm,
-            borderWidth: 1,
-          }}
-        >
-          <Text style={{ color: c.ink, textAlign: "center" }}>21:30</Text>
-        </View>
-        <View
-          style={{
-            width: 100,
-            height: 50,
-            justifyContent: "center",
-            backgroundColor: c.bg,
-            borderRadius: radii.sm,
-            borderWidth: 1,
-          }}
-        >
-          <Text style={{ color: c.ink, textAlign: "center" }}>22:00</Text>
-        </View>
-        <View
-          style={{
-            width: 100,
-            height: 50,
-            justifyContent: "center",
-            backgroundColor: c.bg,
-            borderRadius: radii.sm,
-            borderWidth: 1,
-          }}
-        >
-          <Text style={{ color: c.ink, textAlign: "center" }}>22:30</Text>
-        </View>
+          <Text
+            style={
+              selected == "Now"
+                ? { color: c.surface, textAlign: "center" }
+                : { color: c.ink, textAlign: "center" }
+            }
+          >
+            Now
+          </Text>
+        </Pressable>
+        {availability?.map((time) => (
+          <Pressable
+            key={time}
+            onPress={() => onSelect(time)}
+            style={
+              selected == time
+                ? {
+                    width: 100,
+                    height: 50,
+                    justifyContent: "center",
+                    backgroundColor: c.ink,
+                    borderWidth: 1,
+                    borderColor: c.ink,
+                    borderRadius: radii.sm,
+                  }
+                : {
+                    width: 100,
+                    height: 50,
+                    justifyContent: "center",
+                    backgroundColor: c.bg,
+                    borderRadius: radii.sm,
+                    borderWidth: 1,
+                  }
+            }
+          >
+            <Text
+              style={
+                selected == time
+                  ? { color: c.surface, textAlign: "center" }
+                  : { color: c.ink, textAlign: "center" }
+              }
+            >
+              {time}
+            </Text>
+          </Pressable>
+        ))}
       </ScrollView>
     </View>
   );
 }
 
-function Duration() {
-  const duration = useDurationStore((state) => state.duration);
-  const increment = useDurationStore((state) => state.increment);
-  const decrement = useDurationStore((state) => state.decrement);
-
-  return (
-    <View style={{ gap: spacing.sm }}>
-      <View>
-        <Text style={{ color: c.ink, fontWeight: "700" }}>Duration</Text>
-      </View>
-      <View
-        style={{
-          flexDirection: "row",
-          backgroundColor: c.surface,
-          borderWidth: 1,
-          borderColor: c.ink,
-          borderRadius: radii.md,
-          paddingHorizontal: spacing.lg,
-          paddingVertical: spacing.lg,
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Pressable
-          onPress={decrement}
-          style={{ paddingHorizontal: spacing.sm }}
-        >
-          <MaterialDesignIcons name="minus" size={20} />
-        </Pressable>
-        <Text style={{ fontSize: 18, fontWeight: "700" }}>{duration} hour</Text>
-        <Pressable
-          onPress={increment}
-          style={{ paddingHorizontal: spacing.sm }}
-        >
-          <MaterialDesignIcons name="plus" size={20} />
-        </Pressable>
-      </View>
-    </View>
-  );
-}
-
-function TableTotal({ price }: { price: number }) {
-  const duration = useDurationStore((state) => state.duration);
+function TableTotal({ price, duration }: { price: number; duration: number }) {
   const subTotal = price * duration;
   const tax = subTotal * 0.2;
   const total = subTotal + tax;
@@ -282,11 +211,51 @@ function TableTotal({ price }: { price: number }) {
   );
 }
 
+function Duration({ duration, onIncrement, onDecrement }: DurationProps) {
+  return (
+    <View style={{ gap: spacing.sm }}>
+      <View>
+        <Text style={{ color: c.ink, fontWeight: "700" }}>Duration</Text>
+      </View>
+      <View
+        style={{
+          flexDirection: "row",
+          backgroundColor: c.surface,
+          borderWidth: 1,
+          borderColor: c.ink,
+          borderRadius: radii.md,
+          paddingHorizontal: spacing.lg,
+          paddingVertical: spacing.lg,
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Pressable
+          onPress={onDecrement}
+          style={{ paddingHorizontal: spacing.sm }}
+        >
+          <MaterialDesignIcons name="minus" size={20} />
+        </Pressable>
+        <Text style={{ fontSize: 18, fontWeight: "700" }}>{duration} hour</Text>
+        <Pressable
+          onPress={onIncrement}
+          style={{ paddingHorizontal: spacing.sm }}
+        >
+          <MaterialDesignIcons name="plus" size={20} />
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+
 export default function TableDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
 
+  const [duration, setDuration] = useState(1);
+  const [time, setTime] = useState<string>("Now");
+
   const { data, isPending, isError, refetch } = useQuery({
-    queryKey: ["table"],
+    queryKey: ["table", id],
     queryFn: () => fetchTable(id),
   });
 
@@ -295,39 +264,105 @@ export default function TableDetailScreen() {
   return (
     <SafeAreaView
       style={{
+        flex: 1,
+        justifyContent: "space-between",
         backgroundColor: c.bg,
-        paddingHorizontal: spacing.md,
         gap: spacing.xl,
       }}
     >
-      <Link href="/" asChild>
-        <Pressable
-          style={{
-            gap: spacing.md,
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-        >
-          <MaterialDesignIcons size={40} name="chevron-left" color={c.ink} />
-          <Text
+      <View style={{ gap: spacing.xl, paddingHorizontal: spacing.md }}>
+        <Link href="/" asChild>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Return to Tables"
             style={{
-              fontSize: 18,
-              fontWeight: "700",
+              gap: spacing.md,
+              flexDirection: "row",
+              alignItems: "center",
             }}
           >
-            Table {id}
+            <MaterialDesignIcons size={40} name="chevron-left" color={c.ink} />
+            <Text
+              style={{
+                fontSize: 18,
+                fontWeight: "700",
+              }}
+            >
+              Table {id}
+            </Text>
+          </Pressable>
+        </Link>
+        <TablePhoto />
+
+        <TableDetails table={data} />
+
+        <StartTime
+          availability={data.availability}
+          selected={time}
+          onSelect={setTime}
+        />
+
+        <Duration
+          duration={duration}
+          onIncrement={() => setDuration((d) => d + 1)}
+          onDecrement={() => setDuration((d) => Math.max(1, d - 1))}
+        />
+
+        <TableTotal price={data.price} duration={duration} />
+      </View>
+
+      <View
+        style={{
+          paddingHorizontal: spacing.md,
+          paddingVertical: spacing.md,
+          borderTopWidth: 1,
+          gap: spacing.sm,
+        }}
+      >
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Reserve and pay"
+          style={{
+            paddingVertical: spacing.lg,
+            backgroundColor: c.accent,
+            borderWidth: 1,
+            borderColor: c.accent,
+            borderRadius: radii.md,
+          }}
+        >
+          <Text
+            style={{
+              color: c.surface,
+              textAlign: "center",
+              fontSize: 16,
+              fontWeight: "800",
+            }}
+          >
+            Reserve and pay
           </Text>
         </Pressable>
-      </Link>
-      <TablePhoto />
-
-      <TableDetails table={data} />
-
-      <StartTime />
-
-      <Duration />
-
-      <TableTotal price={data.price} />
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Join queue"
+          style={{
+            paddingVertical: spacing.lg,
+            backgroundColor: c.bg,
+            borderWidth: 1,
+            borderColor: c.ink,
+            borderRadius: radii.md,
+          }}
+        >
+          <Text
+            style={{
+              color: c.ink,
+              textAlign: "center",
+              fontSize: 16,
+            }}
+          >
+            Join the queue instead
+          </Text>
+        </Pressable>
+      </View>
     </SafeAreaView>
   );
 }

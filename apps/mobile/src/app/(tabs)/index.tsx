@@ -1,6 +1,7 @@
 import { fetchTables, TableStatus, VenueTable } from "@/api/venue-api";
 import { chalkTheme, radii, spacing } from "@rackup/ui-tokens";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "expo-router";
 import { Text, View, Pressable, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -22,41 +23,50 @@ function TableCard({ table }: { table: VenueTable }) {
     .join(" . ");
 
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={`${table.name}, ${status.label}`}
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        gap: spacing.lg,
-        padding: spacing.lg,
-        borderWidth: 1.5,
-        borderColor: c.border,
-        borderRadius: radii.md,
-        backgroundColor: c.surface,
+    <Link
+      href={{
+        pathname: "/table/[id]",
+        params: { id: table.id },
       }}
+      asChild
     >
-      <View style={{ flex: 1 }}>
-        <Text style={{ fontSize: 16, fontWeight: "700", color: c.ink }}>
-          {table.name}
-        </Text>
-        <Text style={{ marginTop: 2, fontSize: 13, color: c.muted }}>
-          {detail}
-        </Text>
-      </View>
-      <View
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`${table.name}, ${status.label}`}
         style={{
-          paddingVertical: 6,
-          paddingHorizontal: spacing.md,
+          flex: 1,
+          flexDirection: "row",
+          alignItems: "center",
+          gap: spacing.lg,
+          padding: spacing.lg,
+          borderWidth: 1.5,
+          borderColor: c.border,
           borderRadius: radii.md,
-          backgroundColor: status.bg,
+          backgroundColor: c.surface,
         }}
       >
-        <Text style={{ fontSize: 12, fontWeight: "700", color: status.text }}>
-          {status.label}
-        </Text>
-      </View>
-    </Pressable>
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontSize: 16, fontWeight: "700", color: c.ink }}>
+            {table.name}
+          </Text>
+          <Text style={{ marginTop: 2, fontSize: 13, color: c.muted }}>
+            {detail}
+          </Text>
+        </View>
+        <View
+          style={{
+            paddingVertical: 6,
+            paddingHorizontal: spacing.md,
+            borderRadius: radii.md,
+            backgroundColor: status.bg,
+          }}
+        >
+          <Text style={{ fontSize: 12, fontWeight: "700", color: status.text }}>
+            {status.label}
+          </Text>
+        </View>
+      </Pressable>
+    </Link>
   );
 }
 

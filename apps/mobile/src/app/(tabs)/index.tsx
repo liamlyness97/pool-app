@@ -1,7 +1,7 @@
 import { fetchTables, TableStatus, VenueTable } from "@/api/venue-api";
 import { chalkTheme, radii, spacing } from "@rackup/ui-tokens";
 import { useQuery } from "@tanstack/react-query";
-import { Text, View, StyleSheet, Pressable, FlatList } from "react-native";
+import { Text, View, Pressable, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const c = chalkTheme.colors;
@@ -72,7 +72,7 @@ export default function TablesScreen() {
         <Text style={{ fontSize: 30, fontWeight: "800", color: c.ink }}>
           Tables
         </Text>
-        <Text style={{ marginTop: 6, fontSize: 14, color: c.mutedk }}>
+        <Text style={{ marginTop: 6, fontSize: 14, color: c.muted }}>
           Tap a table to book it or join the queue.
         </Text>
       </View>

@@ -7,7 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const c = chalkTheme.colors;
 
-const STATUS_STYLE: Record<
+export const STATUS_STYLE: Record<
   TableStatus,
   { label: string; bg: string; text: string }
 > = {

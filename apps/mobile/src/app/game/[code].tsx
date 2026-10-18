@@ -3,10 +3,20 @@ import { chalkTheme, radii, spacing } from "@rackup/ui-tokens";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useLocalSearchParams } from "expo-router";
+import { useRef, useState } from "react";
 import { Text, View, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const c = chalkTheme.colors;
+
+type FramesTrackerProps = {
+  you: number;
+  guest: number;
+  incrementYou: () => void;
+  decrementYou: () => void;
+  incrementGuest: () => void;
+  decrementGuest: () => void;
+};
 
 function TimePlayed() {
   return (

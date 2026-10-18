@@ -1,3 +1,4 @@
+
 export type TableStatus = "free" | "in_use" | "reserved";
 
 export interface VenueTable {
@@ -30,6 +31,32 @@ type GameResponse = {
     table: VenueTable;
 }
 
+const DIGITS = '0123456789';
+const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+function randomIndex(max: number): number {
+    const limit = 256 - (256 % max);
+    const buf = new Uint8Array(1);
+
+    do {
+        crypto.getRandomValues(buf)
+    } while (buf[0] >= limit)
+
+    return buf[0] % max
+}
+
+function pick(chars: string): string {
+    return chars[randomIndex(chars.length)]
+}
+
+export function generateCode(): string {
+    const first = pick(DIGITS)
+    const letters = pick(LETTERS) + pick(LETTERS) + pick(LETTERS)
+    const last = pick(DIGITS);
+
+    return `${first}-${letters}${last}`
+}
+
 const TABLES: VenueTable[] = [
   { id: "1", name: "Table 1", kind: "Pool", size: "8ft", status: "free", price: 12, availability: ['19:30', '20:00', '20:30', '21:00', '21:30', '22:00', '22:30'] },
   { id: "2", name: "Table 2", kind: "Pool", size: "8ft", status: "in_use", price: 12, availability: ['19:30', '20:00', '20:30', '21:00', '21:30', '22:00', '22:30'], note: "18 min left" },
@@ -57,14 +84,25 @@ export async function fetchTable(id: string): Promise<VenueTable> {
     await wait(500)
 
     const table = TABLES.find(table => table.id === id);
-
     if (!table) throw new Error (`Table ${id} not found`);
-
     return table
 }
 
-export async function bookTable({tableId, startTime, hours}: {tableId: string, startTime: string, hours: number}): Promise<string> {
+export async function bookTable({tableId, startTime, duration}: {tableId: string, startTime: string, duration: number}): Promise<string> {
     await wait(1000);
+
+    const booking: Game = {
+        id: crypto.randomUUID(), 
+        tableId: tableId, 
+        duration: duration, 
+        startTime: startTime, 
+        started: false, 
+        ended: false, 
+        code: generateCode(), 
+        status: 'paid', 
+        customerId: '1234' 
+    }
+
     return 'Booked'
 }
 
@@ -72,11 +110,9 @@ export async function fetchGame({code}: {code: string}): Promise<GameResponse> {
     await wait(1000);
 
     const game = GAMES.find(game => game.code === code);
-    
     if (!game) throw new Error (`Game not found`);
 
     const table = TABLES.find(table => table.id === game.tableId)
-    
     if (!table) throw new Error (`Table not found`);
 
 

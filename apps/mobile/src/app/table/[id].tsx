@@ -258,10 +258,6 @@ export default function TableDetailScreen() {
     queryFn: () => fetchTable(id),
   });
 
-  const mutation = useMutation({
-    mutationFn: bookTable,
-  });
-
   if (isError || !data) return <Text>Table not found</Text>;
 
   return (
@@ -313,11 +309,6 @@ export default function TableDetailScreen() {
 
         <TableTotal price={data.price} duration={duration} />
       </View>
-      {mutation.isSuccess ? (
-        <View>
-          <Text>Booking successful</Text>
-        </View>
-      ) : null}
 
       <View
         style={{
@@ -327,35 +318,29 @@ export default function TableDetailScreen() {
           gap: spacing.sm,
         }}
       >
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Reserve and pay"
-          onPress={() => {
-            mutation.mutate({
-              tableId: data.id,
+        <Link
+          href={{
+            pathname: "/table/payment",
+            params: {
+              tableId: id,
+              duration: duration,
               startTime: time,
-              hours: duration,
-            });
+              price: data.price,
+            },
           }}
-          style={{
-            paddingVertical: spacing.lg,
-            backgroundColor: c.accent,
-            borderWidth: 1,
-            borderColor: c.accent,
-            borderRadius: radii.md,
-          }}
+          asChild
         >
-          {mutation.isPending ? (
-            <Text
-              style={{
-                color: c.surface,
-                textAlign: "center",
-                fontSize: 16,
-              }}
-            >
-              Booking in progress...
-            </Text>
-          ) : (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Reserve and pay"
+            style={{
+              paddingVertical: spacing.lg,
+              backgroundColor: c.accent,
+              borderWidth: 1,
+              borderColor: c.accent,
+              borderRadius: radii.md,
+            }}
+          >
             <Text
               style={{
                 color: c.surface,
@@ -364,10 +349,10 @@ export default function TableDetailScreen() {
                 fontWeight: "800",
               }}
             >
-              Reserve and pay
+              Continue to payment
             </Text>
-          )}
-        </Pressable>
+          </Pressable>
+        </Link>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Join queue"

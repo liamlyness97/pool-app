@@ -1,7 +1,7 @@
-import { fetchTable, VenueTable } from "@/api/venue-api";
+import { bookTable, fetchTable, VenueTable } from "@/api/venue-api";
 import { chalkTheme, radii, spacing } from "@rackup/ui-tokens";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link, useLocalSearchParams } from "expo-router";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -68,7 +68,7 @@ function TableDetails({ table }: TableCardProps) {
     >
       <View style={{ flex: 1 }}>
         <Text style={{ fontSize: 30, fontWeight: "800", color: c.ink }}>
-          Temp Text
+          {table.name}
         </Text>
         <Text style={{ marginTop: 2, fontSize: 13, color: c.muted }}>
           {detail}
@@ -259,6 +259,10 @@ export default function TableDetailScreen() {
     queryFn: () => fetchTable(id),
   });
 
+  const mutation = useMutation({
+    mutationFn: bookTable,
+  });
+
   if (isError || !data) return <Text>Table not found</Text>;
 
   return (
@@ -310,6 +314,11 @@ export default function TableDetailScreen() {
 
         <TableTotal price={data.price} duration={duration} />
       </View>
+      {mutation.isSuccess ? (
+        <View>
+          <Text>Booking successful</Text>
+        </View>
+      ) : null}
 
       <View
         style={{
@@ -322,6 +331,13 @@ export default function TableDetailScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Reserve and pay"
+          onPress={() => {
+            mutation.mutate({
+              tableId: data.id,
+              startTime: time,
+              hours: duration,
+            });
+          }}
           style={{
             paddingVertical: spacing.lg,
             backgroundColor: c.accent,
@@ -330,16 +346,28 @@ export default function TableDetailScreen() {
             borderRadius: radii.md,
           }}
         >
-          <Text
-            style={{
-              color: c.surface,
-              textAlign: "center",
-              fontSize: 16,
-              fontWeight: "800",
-            }}
-          >
-            Reserve and pay
-          </Text>
+          {mutation.isPending ? (
+            <Text
+              style={{
+                color: c.surface,
+                textAlign: "center",
+                fontSize: 16,
+              }}
+            >
+              Booking in progress...
+            </Text>
+          ) : (
+            <Text
+              style={{
+                color: c.surface,
+                textAlign: "center",
+                fontSize: 16,
+                fontWeight: "800",
+              }}
+            >
+              Reserve and pay
+            </Text>
+          )}
         </Pressable>
         <Pressable
           accessibilityRole="button"

@@ -37,6 +37,13 @@
       "expo-image",
       "expo-status-bar",
       "expo-web-browser",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "barcodeScannerEnabled": true
+        }
+      ],
       "@react-native-vector-icons/material-design-icons"
     ],
     "experiments": {

@@ -7,7 +7,6 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { STATUS_STYLE } from "../(tabs)";
 import { useState } from "react";
-import { FlatList } from "react-native-gesture-handler";
 
 const c = chalkTheme.colors;
 

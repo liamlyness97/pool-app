@@ -4,7 +4,7 @@ import TimeTracker from "@/components/game/TimeTracker";
 import { chalkTheme, radii, spacing } from "@rackup/ui-tokens";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons";
 import { useQuery } from "@tanstack/react-query";
-import { Link, useLocalSearchParams } from "expo-router";
+import { Link, router, useLocalSearchParams } from "expo-router";
 import { useRef, useState } from "react";
 import { Text, View, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -97,6 +97,7 @@ export default function GameScreen() {
             borderColor: c.accent,
             borderRadius: radii.md,
           }}
+          onPress={() => router.navigate("/")}
         >
           <Text
             style={{ color: c.surface, textAlign: "center", fontWeight: "800" }}

@@ -16,7 +16,7 @@ export default function GameScreen() {
   const [youScore, setYouScore] = useState<number>(0);
   const [guestScore, setGuestScore] = useState<number>(0);
 
-  const { data, isPending, isError, refectch } = useQuery({
+  const { data, isPending, isError, refetch } = useQuery({
     queryKey: ["game", code],
     queryFn: () => fetchGame({ code }),
   });

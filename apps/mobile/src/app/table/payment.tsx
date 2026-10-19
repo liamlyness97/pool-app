@@ -106,17 +106,6 @@ export default function PaymentScreen() {
     queryKey: ["table", tableId],
     queryFn: () => fetchTable(tableId),
   });
-  if (isError || !data) return <Text>Table not found</Text>;
-
-  const tableDetail = [data.kind, data.size].filter(Boolean).join(" . ");
-  const bookingDetail = [
-    "Today",
-    startTime,
-    `${duration} ${Number(duration) > 1 ? "hours" : "hour"}`,
-  ]
-    .filter(Boolean)
-    .join(" . ");
-
   const mutation = useMutation({
     mutationFn: bookTable,
     onSuccess: () => {
@@ -128,6 +117,16 @@ export default function PaymentScreen() {
       console.log("Booking failed:", error);
     },
   });
+  if (isError || !data) return <Text>Table not found</Text>;
+
+  const tableDetail = [data.kind, data.size].filter(Boolean).join(" . ");
+  const bookingDetail = [
+    "Today",
+    startTime,
+    `${duration} ${Number(duration) > 1 ? "hours" : "hour"}`,
+  ]
+    .filter(Boolean)
+    .join(" . ");
 
   const subTotal = Number(price) * Number(duration);
   const tax = subTotal * 0.2;

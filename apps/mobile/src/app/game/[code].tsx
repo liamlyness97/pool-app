@@ -1,5 +1,6 @@
 import { fetchGame } from "@/api/venue-api";
 import FramesTracker from "@/components/game/FrameTracker";
+import TimeTracker from "@/components/game/TimeTracker";
 import { chalkTheme, radii, spacing } from "@rackup/ui-tokens";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons";
 import { useQuery } from "@tanstack/react-query";
@@ -9,55 +10,6 @@ import { Text, View, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const c = chalkTheme.colors;
-
-type FramesTrackerProps = {
-  you: number;
-  guest: number;
-  incrementYou: () => void;
-  decrementYou: () => void;
-  incrementGuest: () => void;
-  decrementGuest: () => void;
-};
-
-function TimePlayed() {
-  return (
-    <View
-      style={{
-        backgroundColor: c.surface,
-        borderRadius: radii.md,
-        borderWidth: 1,
-        borderColor: c.ink,
-        paddingVertical: spacing.xxl,
-        alignItems: "center",
-        gap: spacing.sm,
-      }}
-    >
-      <Text
-        style={{
-          color: c.muted,
-        }}
-      >
-        Time played
-      </Text>
-      <Text
-        style={{
-          color: c.ink,
-          fontSize: 50,
-          fontWeight: "700",
-        }}
-      >
-        00:42:10
-      </Text>
-      <Text
-        style={{
-          color: c.muted,
-        }}
-      >
-        Running total
-      </Text>
-    </View>
-  );
-}
 
 export default function GameScreen() {
   const { code } = useLocalSearchParams<{ code: string }>();
@@ -95,7 +47,10 @@ export default function GameScreen() {
                 {data.table.name}
               </Text>
             </View>
-            <TimePlayed />
+            <TimeTracker
+              startTime={data.game.startTime}
+              endTime={data.game.endTime}
+            />
             <View style={{ gap: spacing.sm }}>
               <View>
                 <Text style={{ color: c.ink, fontWeight: "700" }}>Frames</Text>

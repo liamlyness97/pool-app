@@ -1,4 +1,4 @@
-import { bookTable, fetchTable } from "@/api/venue-api";
+import { bookTable, fetchTable, timeToDate } from "@/api/venue-api";
 import { chalkTheme, radii, spacing } from "@rackup/ui-tokens";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -132,6 +132,8 @@ export default function PaymentScreen() {
   const subTotal = Number(price) * Number(duration);
   const tax = subTotal * 0.2;
   const total = subTotal + tax;
+
+  const HOUR_MS = 60 * 60 * 1000;
   return (
     <SafeAreaView style={{ flex: 1, justifyContent: "space-between" }}>
       <View style={{ gap: spacing.xl, paddingHorizontal: spacing.md }}>
@@ -185,7 +187,8 @@ export default function PaymentScreen() {
           onPress={() => {
             mutation.mutate({
               tableId: tableId,
-              startTime: startTime,
+              startTime: timeToDate(startTime).toISOString(),
+              endTime: `${timeToDate(startTime).getTime() + Number(duration) * HOUR_MS}`,
               duration: Number(duration),
               idempotencyKey: Crypto.randomUUID(),
             });

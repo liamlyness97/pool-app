@@ -20,6 +20,7 @@ export interface Game {
     tableId: string;
     duration: number;
     startTime: string;
+    endTime: string;
     started: boolean;
     code: string;
     status: GameStatus;
@@ -50,6 +51,13 @@ function pick(chars: string): string {
     return chars[randomIndex(chars.length)]
 }
 
+export function timeToDate(time: string, base: Date = new Date()): Date {
+    const [hours, minutes] = time.split(":").map(Number);
+    const date = new Date(base);
+    date.setHours(hours, minutes, 0, 0);
+    return date
+}
+
 export function generateCode(): string {
     const first = pick(DIGITS)
     const letters = pick(LETTERS) + pick(LETTERS) + pick(LETTERS)
@@ -67,11 +75,11 @@ const TABLES: VenueTable[] = [
 ];
 
 const GAMES: Game[] = [
-    { id: "1", tableId: "3", duration: 2, startTime: '20:00', started: false, ended: false, code: '3-LYN3', status: 'paid', customerId: '1234' },
-    { id: "2", tableId: "1", duration: 1, startTime: '19:30', started: false, ended: false, code: '4-LYN3', status: 'paid', customerId: '1234'  },
-    { id: "3", tableId: "3", duration: 1, startTime: '22:00', started: false, ended: false, code: '5-LYN3', status: 'paid', customerId: '1234' },
-    { id: "4", tableId: "5", duration: 3, startTime: '19:00', started: false, ended: false, code: '6-LYN3', status: 'paid', customerId: '1234' },
-    { id: "5", tableId: "2", duration: 1, startTime: '21:30', started: false, ended: false, code: '7-LYN3', status: 'paid', customerId: '1234' },
+    { id: "1", tableId: "3", duration: 2, startTime: '2026-10-19T20:00:00.000Z', endTime: '2026-10-19T22:00:00.000Z', started: false, ended: false, code: '3-LYN3', status: 'paid', customerId: '1234' },
+    { id: "2", tableId: "1", duration: 1, startTime: '2026-10-19T19:30:00.000Z', endTime: '2026-10-19T20:30:00.000Z', started: false, ended: false, code: '4-LYN3', status: 'paid', customerId: '1234'  },
+    { id: "3", tableId: "3", duration: 1, startTime: '2026-10-19T22:00:00.000Z', endTime: '2026-10-19T23:00:00.000Z', started: false, ended: false, code: '5-LYN3', status: 'paid', customerId: '1234' },
+    { id: "4", tableId: "5", duration: 3, startTime: '2026-10-19T19:00:00.000Z', endTime: '2026-10-19T22:00:00.000Z', started: false, ended: false, code: '6-LYN3', status: 'paid', customerId: '1234' },
+    { id: "5", tableId: "2", duration: 1, startTime: '2026-10-19T21:30:00.000Z',endTime: '2026-10-19T22:30:00.000Z', started: false, ended: false, code: '7-LYN3', status: 'paid', customerId: '1234' },
 ]
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -89,14 +97,15 @@ export async function fetchTable(id: string): Promise<VenueTable> {
     return table
 }
 
-export async function bookTable({tableId, startTime, duration, idempotencyKey}: {tableId: string, startTime: string, duration: number, idempotencyKey: string}): Promise<string> {
+export async function bookTable({tableId, startTime, endTime, duration, idempotencyKey}: {tableId: string, startTime: string, endTime: string, duration: number, idempotencyKey: string}): Promise<string> {
     await wait(1000);
 
     const booking: Game = {
         id: Crypto.randomUUID(), 
         tableId: tableId, 
         duration: duration, 
-        startTime: startTime, 
+        startTime: startTime,
+        endTime: endTime, 
         started: false, 
         ended: false, 
         code: generateCode(), 

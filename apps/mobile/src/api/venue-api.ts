@@ -1,3 +1,4 @@
+import * as Crypto from "expo-crypto";
 
 export type TableStatus = "free" | "in_use" | "reserved";
 
@@ -39,7 +40,7 @@ function randomIndex(max: number): number {
     const buf = new Uint8Array(1);
 
     do {
-        crypto.getRandomValues(buf)
+        Crypto.getRandomValues(buf)
     } while (buf[0] >= limit)
 
     return buf[0] % max
@@ -88,11 +89,11 @@ export async function fetchTable(id: string): Promise<VenueTable> {
     return table
 }
 
-export async function bookTable({tableId, startTime, duration}: {tableId: string, startTime: string, duration: number}): Promise<string> {
+export async function bookTable({tableId, startTime, duration, idempotencyKey}: {tableId: string, startTime: string, duration: number, idempotencyKey: string}): Promise<string> {
     await wait(1000);
 
     const booking: Game = {
-        id: crypto.randomUUID(), 
+        id: Crypto.randomUUID(), 
         tableId: tableId, 
         duration: duration, 
         startTime: startTime, 

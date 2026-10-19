@@ -2,9 +2,10 @@ import { bookTable, fetchTable } from "@/api/venue-api";
 import { chalkTheme, radii, spacing } from "@rackup/ui-tokens";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Link, useLocalSearchParams } from "expo-router";
+import { Link, router, useLocalSearchParams } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as Crypto from "expo-crypto";
 
 const c = chalkTheme.colors;
 
@@ -65,26 +66,13 @@ function CheckoutTotaL({
 
 function TableInfo({
   name,
-  kind,
-  size,
-  startTime,
-  duration,
+  tableDetail,
+  bookingDetail,
 }: {
   name: string;
-  kind: "Pool" | "Snooker";
-  size: string;
-  startTime: string;
-  duration: number;
+  tableDetail: string;
+  bookingDetail: string;
 }) {
-  const tableDetail = [kind, size].filter(Boolean).join(" . ");
-  const bookingDetail = [
-    "Today",
-    startTime,
-    `${duration} ${duration > 1 ? "hours" : "hour"}`,
-  ]
-    .filter(Boolean)
-    .join(" . ");
-
   return (
     <View style={{ paddingHorizontal: spacing.md }}>
       <View
@@ -120,9 +108,30 @@ export default function PaymentScreen() {
   });
   if (isError || !data) return <Text>Table not found</Text>;
 
+  const tableDetail = [data.kind, data.size].filter(Boolean).join(" . ");
+  const bookingDetail = [
+    "Today",
+    startTime,
+    `${duration} ${Number(duration) > 1 ? "hours" : "hour"}`,
+  ]
+    .filter(Boolean)
+    .join(" . ");
+
   const mutation = useMutation({
     mutationFn: bookTable,
+    onSuccess: () => {
+      router.replace({
+        pathname: "/table/confirmation",
+      });
+    },
+    onError: (error) => {
+      console.log("Booking failed:", error);
+    },
   });
+
+  const subTotal = Number(price) * Number(duration);
+  const tax = subTotal * 0.2;
+  const total = subTotal + tax;
   return (
     <SafeAreaView style={{ flex: 1, justifyContent: "space-between" }}>
       <View style={{ gap: spacing.xl, paddingHorizontal: spacing.md }}>
@@ -157,10 +166,8 @@ export default function PaymentScreen() {
         </View>
         <TableInfo
           name={data.name}
-          kind={data.kind}
-          size={data.size}
-          startTime={startTime}
-          duration={Number(duration)}
+          tableDetail={tableDetail}
+          bookingDetail={bookingDetail}
         />
         <CheckoutTotaL price={Number(price)} duration={Number(duration)} />
       </View>
@@ -180,6 +187,7 @@ export default function PaymentScreen() {
               tableId: tableId,
               startTime: startTime,
               duration: Number(duration),
+              idempotencyKey: Crypto.randomUUID(),
             });
           }}
           style={{
@@ -209,7 +217,7 @@ export default function PaymentScreen() {
                 fontWeight: "800",
               }}
             >
-              Continue to payment
+              Pay £{total.toFixed(2)}
             </Text>
           )}
         </Pressable>
@@ -228,7 +236,6 @@ export default function PaymentScreen() {
               color: c.ink,
               textAlign: "center",
               fontSize: 16,
-              fontWeight: "800",
             }}
           >
             Cancel

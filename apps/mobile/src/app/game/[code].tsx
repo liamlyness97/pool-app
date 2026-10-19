@@ -1,4 +1,5 @@
 import { fetchGame } from "@/api/venue-api";
+import FramesTracker from "@/components/game/FrameTracker";
 import { chalkTheme, radii, spacing } from "@rackup/ui-tokens";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons";
 import { useQuery } from "@tanstack/react-query";
@@ -58,158 +59,10 @@ function TimePlayed() {
   );
 }
 
-function FramesTracker() {
-  return (
-    <View style={{ gap: spacing.sm }}>
-      <View>
-        <Text style={{ color: c.ink, fontWeight: "700" }}>Frames</Text>
-      </View>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          gap: spacing.lg,
-        }}
-      >
-        <View
-          style={{
-            flexGrow: 1,
-            alignItems: "center",
-            backgroundColor: c.surface,
-            borderRadius: radii.md,
-            borderWidth: 1,
-            borderColor: c.ink,
-            paddingVertical: spacing.lg,
-            gap: spacing.sm,
-          }}
-        >
-          <View>
-            <Text
-              style={{
-                fontWeight: "700",
-              }}
-            >
-              You
-            </Text>
-          </View>
-          <View>
-            <Text
-              style={{
-                fontWeight: "900",
-                fontSize: 40,
-              }}
-            >
-              2
-            </Text>
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              gap: spacing.sm,
-            }}
-          >
-            <Pressable
-              style={{
-                borderWidth: 1,
-                borderColor: c.ink,
-                height: 40,
-                width: 40,
-                justifyContent: "center",
-                alignItems: "center",
-                borderRadius: radii.sm,
-              }}
-            >
-              <MaterialDesignIcons name="minus" size={20} />
-            </Pressable>
-            <Pressable
-              style={{
-                borderWidth: 1,
-                borderColor: c.ink,
-                height: 40,
-                width: 40,
-                justifyContent: "center",
-                alignItems: "center",
-                borderRadius: radii.sm,
-                backgroundColor: c.ink,
-              }}
-            >
-              <MaterialDesignIcons name="plus" color={c.surface} size={20} />
-            </Pressable>
-          </View>
-        </View>
-        <View
-          style={{
-            flexGrow: 1,
-            alignItems: "center",
-            backgroundColor: c.surface,
-            borderRadius: radii.md,
-            borderWidth: 1,
-            borderColor: c.ink,
-            paddingVertical: spacing.lg,
-            gap: spacing.sm,
-          }}
-        >
-          <View>
-            <Text
-              style={{
-                fontWeight: "700",
-              }}
-            >
-              Guest
-            </Text>
-          </View>
-          <View>
-            <Text
-              style={{
-                fontWeight: "900",
-                fontSize: 40,
-              }}
-            >
-              1
-            </Text>
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              gap: spacing.sm,
-            }}
-          >
-            <Pressable
-              style={{
-                borderWidth: 1,
-                borderColor: c.ink,
-                height: 40,
-                width: 40,
-                justifyContent: "center",
-                alignItems: "center",
-                borderRadius: radii.sm,
-              }}
-            >
-              <MaterialDesignIcons name="minus" size={20} />
-            </Pressable>
-            <Pressable
-              style={{
-                borderWidth: 1,
-                borderColor: c.ink,
-                height: 40,
-                width: 40,
-                justifyContent: "center",
-                alignItems: "center",
-                borderRadius: radii.sm,
-                backgroundColor: c.ink,
-              }}
-            >
-              <MaterialDesignIcons name="plus" color={c.surface} size={20} />
-            </Pressable>
-          </View>
-        </View>
-      </View>
-    </View>
-  );
-}
-
 export default function GameScreen() {
   const { code } = useLocalSearchParams<{ code: string }>();
+  const [youScore, setYouScore] = useState<number>(0);
+  const [guestScore, setGuestScore] = useState<number>(0);
 
   const { data, isPending, isError, refectch } = useQuery({
     queryKey: ["game", code],
@@ -243,7 +96,31 @@ export default function GameScreen() {
               </Text>
             </View>
             <TimePlayed />
-            <FramesTracker />
+            <View style={{ gap: spacing.sm }}>
+              <View>
+                <Text style={{ color: c.ink, fontWeight: "700" }}>Frames</Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  gap: spacing.lg,
+                }}
+              >
+                <FramesTracker
+                  name="You"
+                  frames={youScore}
+                  onIncrement={() => setYouScore((f) => f + 1)}
+                  onDecrement={() => setYouScore((f) => Math.max(0, f - 1))}
+                />
+                <FramesTracker
+                  name="Guest"
+                  frames={guestScore}
+                  onIncrement={() => setGuestScore((f) => f + 1)}
+                  onDecrement={() => setGuestScore((f) => Math.max(0, f - 1))}
+                />
+              </View>
+            </View>
           </View>
         )}
       </View>
